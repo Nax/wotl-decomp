@@ -4,9 +4,12 @@ module Decomp
     # inside a single section.
     def self.run(section, data)
       flags = 0x00
-      align = 0x10
+      align = 4
       type = 0x01 # SHT_PROGBITS
       case section
+      when '.text'
+        flags = 0x06 # SHF_ALLOC | SHF_EXECINSTR
+        align = 64
       when /\.text/
         flags = 0x06 # SHF_ALLOC | SHF_EXECINSTR
       when /\.rodata/, /\.lib/
@@ -62,7 +65,7 @@ module Decomp
       elf[0x1000 + 2 * 0x28 + 0x14,4] = [data.length].pack('L<') # Size
       elf[0x1000 + 2 * 0x28 + 0x18,4] = [0].pack('L<') # Link
       elf[0x1000 + 2 * 0x28 + 0x1c,4] = [0].pack('L<') # Info
-      elf[0x1000 + 2 * 0x28 + 0x20,4] = [4].pack('L<') # Address alignment
+      elf[0x1000 + 2 * 0x28 + 0x20,4] = [align].pack('L<') # Address alignment
       elf[0x1000 + 2 * 0x28 + 0x24,4] = [0].pack('L<') # Entry size
 
       # 0x2000 - .shstrtab data
