@@ -1,0 +1,4 @@
+files:
+  - name: items.c
+    sections:
+      text: [0x08a18d80, 0x08a18dc0]

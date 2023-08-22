@@ -1,0 +1,45 @@
+ENTRY(_start)
+
+PHDRS
+{
+  text    PT_LOAD ;
+}
+
+SECTIONS
+{
+  . = 0x08804000;
+
+  .text : { @FILES_TEXT@ } :text
+  .rel.text : { . = .; }
+
+  .sceStub.text : { @FILES_SCESTUB_TEXT@ } :text
+  .rel.sceStub.text : { . = .; }
+
+  .lib.ent.top : { @FILES_LIB_ENT_TOP@ } :text
+  .lib.ent : { @FILES_LIB_ENT@ } :text
+  .rel.lib.ent : { . = .; }
+  .lib.ent.btm : { @FILES_LIB_ENT_BTM@ } :text
+
+  .lib.stub.top : { @FILES_LIB_STUB_TOP@ } :text
+  .lib.stub : { @FILES_LIB_STUB@ } :text
+  .rel.lib.stub : { . = .; }
+  .lib.stub.btm : { @FILES_LIB_STUB_BTM@ } :text
+
+  .rodata.sceModuleInfo : { @FILES_RODATA_SCEMODULEINFO@ } :text
+  .rel.rodata.sceModuleInfo : { . = .; }
+  .rodata.sceResident : { @FILES_RODATA_SCERESIDENT@ } :text
+  .rel.rodata.sceResident : { . = .; }
+  .rodata.sceNid : { @FILES_RODATA_SCENID@ } :text
+  .rodata.sceVstub : { . = .; } :text
+
+  .data : { @FILES_DATA@ } :text
+  .rel.data : { . = .; }
+
+  .bss : { . = .; @FILES_BSS@ } :text
+
+  .comment : { . = .; @FILES_COMMENT@ }
+
+  /DISCARD/ : { *(.*) }
+
+  _start = 0x08814b00;
+}

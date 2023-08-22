@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'decomp/common'
 require 'decomp/elf_wrapper'
+require 'decomp/chunk_set'
 
 module Decomp
   module ElfExtractor
@@ -23,10 +24,6 @@ module Decomp
     ]
 
     def self.run
-      # Make the directory
-      obj_dir = File.join(ROOT, 'build', 'gen', 'obj')
-      FileUtils.mkdir_p(obj_dir)
-
       # Load the ELF file
       f = File.open(File.join(ROOT, 'rom', 'BOOT.BIN'), 'rb')
       data = f.read
@@ -41,6 +38,7 @@ module Decomp
       shstrtab = data[e_shoff + e_shstrndx * 0x28 + 0x10,4].unpack('L<')[0]
 
       # Parse the section header
+      cs = ChunkSet.new
       e_shnum.times do |i|
         sh_name = data[e_shoff + i * 0x28 + 0x00,4].unpack('L<')[0]
         name = data[shstrtab + sh_name, data[shstrtab + sh_name..-1].index("\x00")].strip
@@ -49,10 +47,10 @@ module Decomp
         sh_offset = data[e_shoff + i * 0x28 + 0x10,4].unpack('L<')[0]
         sh_size = data[e_shoff + i * 0x28 + 0x14,4].unpack('L<')[0]
         section_data = data[sh_offset, sh_size]
-        obj_name = File.join(obj_dir, name[1..-1] + '.o')
-        obj_data = ElfWrapper.run(name, section_data)
-        File.binwrite(obj_name, obj_data)
+        cs.add_raw(name, sh_addr, sh_size, section_data)
       end
+
+      cs
     end
   end
 end
