@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'yaml'
+require 'digest'
 require 'decomp/common'
 require 'decomp/elf_wrapper'
 require 'decomp/elf_extractor'
@@ -77,6 +78,36 @@ module Decomp
     end
   end
 
+  def self.find_diff()
+    good_file_path = File.join(ROOT, 'rom', 'BOOT.BIN')
+    bad_file_path = File.join(ROOT, 'build', 'bin', 'BOOT.BIN')
+    good_file = File.open(good_file_path, 'rb')
+    bad_file = File.open(bad_file_path, 'rb')
+    good_file.seek(0x54)
+    bad_file.seek(0x54)
+    vaddr = 0x08804000
+    while true
+      good_data = good_file.read(4)
+      bad_data = bad_file.read(4)
+      if good_data != bad_data
+        return vaddr
+      end
+      vaddr += 4
+    end
+  end
+
+  def self.validate()
+    target_sum = "ae0319c5c31885930d76a5c7dc1d389cd664365c48205ed887f002e01ed4abc4"
+    target_path = File.join(ROOT, 'build', 'bin', 'BOOT.BIN')
+    if Digest::SHA256.file(target_path).hexdigest != target_sum
+      puts "Image NOT matching!"
+      addr = find_diff()
+      puts "Diff at 0x#{"%08x" % addr}"
+      exit(1)
+    end
+    puts "Image matching!"
+  end
+
   def self.run(args)
     # Make the build tree
     FileUtils.mkdir_p(File.join(ROOT, 'build', 'gen', 'obj'))
@@ -93,5 +124,8 @@ module Decomp
 
     # Fix the build
     ElfFixup.run(File.join(ROOT, 'build', 'bin', 'BOOT.elf'), File.join(ROOT, 'build', 'bin', 'BOOT.BIN'))
+
+    # Validate
+    validate()
   end
 end
