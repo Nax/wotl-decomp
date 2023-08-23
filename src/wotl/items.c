@@ -1,4 +1,6 @@
-int IsItemInvalid(unsigned short itemId)
+#include <wotl/items.h>
+
+int IsItemInvalid(u16 itemId)
 {
     int invalid;
 

@@ -1,4 +1,6 @@
-int IsItemMinerva(unsigned short itemId)
+#include <wotl/items.h>
+
+int IsItemMinerva(u16 itemId)
 {
     switch (itemId)
     {
