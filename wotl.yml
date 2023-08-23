@@ -4,4 +4,4 @@ files:
       text: [0x08a18c00, 0x08a18c40]
   - name: items2.c
     sections:
-      text: [0x08a18d80, 0x08a18dc0]
+      text: [0x08a18d00, 0x08a18dc0]
