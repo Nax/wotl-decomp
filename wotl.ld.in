@@ -42,4 +42,7 @@ SECTIONS
   /DISCARD/ : { *(.*) }
 
   _start = 0x08814b00;
+
+  kItemTable = 0x08b29288;
+  kItemTable2 = 0x08a5adac;
 }
